@@ -4,11 +4,10 @@ import os
 import matplotlib.pyplot as plt
 
 class DataLoader:
-    def __init__(self, data, batch_size, shuffle = False, transform = None):
+    def __init__(self, data, batch_size, shuffle = False):
         self.data = data
         self.batch_size = batch_size
         self.shuffle = shuffle
-        self.transform = transform
 
     def shuffle_data(self):
         if self.shuffle:
@@ -21,8 +20,6 @@ class DataLoader:
                 self.shuffle_data()
             batch_data = self.data[pointer:pointer + self.batch_size]
             pointer = (pointer + self.batch_size) % len(self.data)
-            if self.transform:
-                batch_data = self.transform(batch_data)
             if len(batch_data) == self.batch_size:
                 yield batch_data
 
