@@ -1,7 +1,8 @@
-import numpy as np
-import cv2
+from torchvision.io import read_image
 import os
 import matplotlib.pyplot as plt
+import torch
+from torchvision.io import read_image
 
 class DataLoader:
     def __init__(self, data, batch_size, shuffle = False):
@@ -11,7 +12,8 @@ class DataLoader:
 
     def shuffle_data(self):
         if self.shuffle:
-            np.random.shuffle(self.data)
+            idx = torch.randperm(len(self.data))
+            self.data = self.data[idx]
 
     def new_batch(self):
         pointer = 0
@@ -32,11 +34,13 @@ if __name__ == '__main__':
         images = []
         image_files = os.listdir(image_folder)
         for image_file in image_files:
-            image_path = os.path.join(image_folder, image_file)
-            image = cv2.imread(image_path)
-            if image is not None:
-                images.append(image)
-        return np.array(images)
+            if image_file.endswith(".jpg") or image_file.endswith(".jpeg"):
+                image_path = os.path.join(image_folder, image_file)
+                image = read_image(image_path)
+                if image is not None:
+                    images.append(image)
+        return torch.stack(images)
+
 
     image_folder = "train"
     image_array = read_images_to_array(image_folder)
@@ -48,6 +52,7 @@ if __name__ == '__main__':
     for k, batch in enumerate(d):
         if k == 3:
             break
-        plt.imshow(batch[0])
+        plt.imshow(batch[0].permute(1, 2, 0))
         plt.axis('off')  # Hide axes
         plt.show()
+        print(batch.shape)
